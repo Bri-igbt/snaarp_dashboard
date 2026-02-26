@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Folder, X, Upload, CheckCircle } from "lucide-react";
+import { Upload, X, CheckCircle, Folder } from "lucide-react";
 import toast from "react-hot-toast";
 
 type UploadedItem = {
@@ -92,16 +92,21 @@ const UploadDropzone = () => {
 
     return (
         <section
-            className={`bg-white border-2 border-dashed rounded-xl transition
-                min-h-[50vh] sm:min-h-[60vh] lg:min-h-[70vh]
-                p-4 sm:p-6 lg:p-8
+            className={`
+                relative
+                min-h-[70vh]
+                w-full
+                rounded-xl
+                border-2 border-dashed
+                transition-all duration-300
                 flex items-center justify-center
+                bg-white/75
                 ${
                 isDragging
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-300 hover:border-blue-500"
-            }`}
-            aria-label="Upload area"
+                    ? "border-blue-500 bg-[#0f1b33]"
+                    : "border-slate-500/40"
+            }
+            `}
             onDragOver={(e) => {
                 e.preventDefault();
                 setIsDragging(true);
@@ -119,23 +124,38 @@ const UploadDropzone = () => {
 
             {!hasItems && (
                 <div
-                    className="flex h-full w-full cursor-pointer flex-col items-center justify-center text-center"
                     onClick={handleBrowse}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === "Enter" && handleBrowse()}
+                    className="flex flex-col items-center justify-center text-center cursor-pointer select-none"
                 >
-                    <p className="text-lg font-medium text-gray-800">
-                        Drag and drop your images and charts here
-                    </p>
+                    {/* Cloud Upload Icon */}
+                    <div className="mb-6 flex items-center justify-center">
+                        <div className="w-24 h-24 rounded-full bg-slate-600/40 flex items-center justify-center">
+                            <Upload
+                                size={40}
+                                className="text-slate-300"
+                                strokeWidth={1.5}
+                            />
+                        </div>
+                    </div>
 
-                    <p className="mt-1 text-sm text-gray-500">
-                        or <span className="text-blue-600 underline">browse to upload</span>
-                    </p>
+                    {/* Main Text */}
+                    <h2 className="text-2xl sm:text-3xl font-semibold">
+                        Drag and Drop assets here
+                    </h2>
+
+                    <p className="mt-4 text-lg text-slate-800">Or</p>
+
+                    {/* Browse Button */}
+                    <button
+                        type="button"
+                        className="mt-6 px-8 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium transition"
+                    >
+                        Browse
+                    </button>
 
                     {uploaded && (
-                        <p className="mt-3 flex items-center justify-center gap-1 text-sm text-green-600">
-                            <CheckCircle size={14} />
+                        <p className="mt-5 flex items-center gap-2 text-green-400 text-sm">
+                            <CheckCircle size={16} />
                             Upload complete
                         </p>
                     )}
@@ -143,17 +163,17 @@ const UploadDropzone = () => {
             )}
 
             {hasItems && (
-                <div className="flex h-full w-full flex-col items-center justify-center">
-                    <div className="mb-6 flex flex-wrap justify-center gap-6">
+                <div className="flex flex-col items-center justify-center w-full px-6">
+                    <div className="mb-8 flex flex-wrap justify-center gap-6">
                         {items.map((item) => (
                             <div
                                 key={item.id}
-                                className="relative group w-24 h-24 rounded-lg bg-gray-100 border flex items-center justify-center"
+                                className="relative group w-28 h-28 rounded-lg bg-slate-700 border border-slate-600 flex items-center justify-center"
                             >
                                 <button
                                     type="button"
                                     onClick={() => removeItem(item.id)}
-                                    className="absolute -top-2 -right-2 bg-gray-900 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                                    className="absolute -top-2 -right-2 bg-black text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
                                 >
                                     <X size={14} />
                                 </button>
@@ -165,17 +185,20 @@ const UploadDropzone = () => {
                                         className="w-full h-full object-cover rounded-lg"
                                     />
                                 ) : (
-                                    <Folder className="text-gray-500" size={36} />
+                                    <Folder
+                                        className="text-slate-300"
+                                        size={36}
+                                    />
                                 )}
                             </div>
                         ))}
                     </div>
 
-                    <div className="flex flex-col items-center gap-3">
+                    <div className="flex flex-col items-center gap-4">
                         <button
                             type="button"
                             onClick={handleBrowse}
-                            className="text-sm text-blue-600 underline"
+                            className="text-sm text-blue-400 underline"
                         >
                             Add more files
                         </button>
@@ -184,9 +207,9 @@ const UploadDropzone = () => {
                             type="button"
                             onClick={handleUpload}
                             disabled={uploading}
-                            className="flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition"
+                            className="flex items-center gap-2 px-8 py-3 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition"
                         >
-                            <Upload size={16} />
+                            <Upload size={18} />
                             {uploading ? "Uploading…" : "Upload files"}
                         </button>
                     </div>

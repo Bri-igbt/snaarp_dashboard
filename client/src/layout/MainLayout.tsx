@@ -31,12 +31,23 @@ const MainLayout = () => {
                     <Outlet/>
                 </main>
 
-                <footer className="bg-white border-t border-gray-200 px-6 py-4 text-sm text-gray-500 flex justify-between">
-                    <p>© {new Date().getFullYear()} Snaarp. All rights reserved.</p>
-                    <div className="flex gap-6">
-                        <span className="hover:text-gray-700 cursor-pointer transition">Privacy Policy</span>
-                        <span className="hover:text-gray-700 cursor-pointer transition">Terms of Service</span>
-                        <span className="hover:text-gray-700 cursor-pointer transition">Support</span>
+                <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4 text-sm text-gray-500">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <p className="text-center sm:text-left">
+                            © {new Date().getFullYear()} Snaarp. All rights reserved.
+                        </p>
+
+                        <div className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6 text-center">
+                            <span className="hover:text-gray-700 cursor-pointer transition">
+                                Privacy Policy
+                            </span>
+                            <span className="hover:text-gray-700 cursor-pointer transition">
+                                Terms of Service
+                            </span>
+                            <span className="hover:text-gray-700 cursor-pointer transition">
+                                Support
+                            </span>
+                        </div>
                     </div>
                 </footer>
             </div>
