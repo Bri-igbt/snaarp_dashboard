@@ -1,6 +1,6 @@
 # Snaarp Drag-and-Drop Dashboard
 
-<img src="https://res.cloudinary.com/dhdcmkuhx/image/upload/v1772047920/Screenshot_2026-02-25_at_20.28.37_myvsmg.png" />
+<img src="https://res.cloudinary.com/dhdcmkuhx/image/upload/v1772108630/Screenshot_2026-02-26_at_13.23.26_pzljqh.png" />
 
 A modern, accessible React + TypeScript demo that showcases a draggable dashboard and a local upload dropzone. Users can reorder widgets via drag-and-drop (mouse/touch + keyboard) and persist their preferred layout in the browser. The upload area lets users select or drop files, previews images, and simulates an upload with user feedback.
 
