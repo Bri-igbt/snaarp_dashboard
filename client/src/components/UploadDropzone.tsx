@@ -6,10 +6,25 @@ type UploadedItem = {
     id: string;
     name: string;
     type: string;
+    size: number;
+    file?: File;
     preview?: string;
 };
 
-const UploadDropzone = () => {
+export type UploadedAsset = {
+    id: string;
+    name: string;
+    type: string;
+    size: number;
+    dataUrl: string;
+    createdAt: number;
+};
+
+type UploadDropzoneProps = {
+    onComplete?: (files: UploadedAsset[]) => void;
+};
+
+const UploadDropzone = ({ onComplete }: UploadDropzoneProps) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
 
     const [isDragging, setIsDragging] = useState(false);
@@ -25,10 +40,24 @@ const UploadDropzone = () => {
         };
     }, []);
 
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
     const addFiles = (fileList: FileList | null) => {
         if (!fileList) return;
 
-        const newItems: UploadedItem[] = Array.from(fileList).map((file) => {
+        const files = Array.from(fileList);
+        const tooLarge = files.filter((f) => f.size > MAX_FILE_SIZE);
+        const allowed = files.filter((f) => f.size <= MAX_FILE_SIZE);
+
+        if (tooLarge.length > 0) {
+            const names = tooLarge.slice(0, 3).map((f) => f.name).join(", ");
+            const more = tooLarge.length > 3 ? ` and ${tooLarge.length - 3} more` : "";
+            toast.error(`Some files exceed the 5MB limit: ${names}${more}`);
+        }
+
+        if (allowed.length === 0) return;
+
+        const newItems: UploadedItem[] = allowed.map((file) => {
             const preview = file.type.startsWith("image/")
                 ? URL.createObjectURL(file)
                 : undefined;
@@ -39,6 +68,8 @@ const UploadDropzone = () => {
                 id: crypto.randomUUID(),
                 name: file.name,
                 type: file.type,
+                size: file.size,
+                file,
                 preview,
             };
         });
@@ -68,22 +99,52 @@ const UploadDropzone = () => {
         });
     };
 
+    const fileToDataUrl = (file: File) =>
+        new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+
     const handleUpload = async () => {
         if (items.length === 0) return;
 
         setUploading(true);
         toast.loading("Uploading files…", { id: "upload" });
 
-        await new Promise((res) => setTimeout(res, 1500));
+        // Simulate network delay
+        await new Promise((res) => setTimeout(res, 800));
+
+        // Convert selected files to data URLs for persistence/display
+        const assetsPromises = items
+            .filter((i) => !!i.file)
+            .map(async (i) => {
+                const dataUrl = await fileToDataUrl(i.file as File);
+                const asset = {
+                    id: crypto.randomUUID(),
+                    name: i.name,
+                    type: i.type,
+                    size: i.size,
+                    dataUrl,
+                    createdAt: Date.now(),
+                } as UploadedAsset;
+                return asset;
+            });
+        const assets = await Promise.all(assetsPromises);
 
         setUploading(false);
         setUploaded(true);
 
+        // Cleanup previews
         items.forEach((i) => {
             if (i.preview) URL.revokeObjectURL(i.preview);
         });
         previewUrls.current.clear();
         setItems([]);
+
+        // Notify parent
+        onComplete?.(assets);
 
         toast.success("Files uploaded successfully", { id: "upload" });
     };
@@ -94,7 +155,7 @@ const UploadDropzone = () => {
         <section
             className={`
                 relative
-                min-h-[70vh]
+                min-h-[50vh] sm:min-h-[70vh]
                 w-full
                 rounded-xl
                 border-2 border-dashed

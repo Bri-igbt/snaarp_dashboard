@@ -4,7 +4,7 @@
 
 A modern, accessible React + TypeScript demo that showcases a draggable dashboard and a local upload dropzone. Users can reorder widgets via drag-and-drop (mouse/touch + keyboard) and persist their preferred layout in the browser. The upload area lets users select or drop files, previews images, and simulates an upload with user feedback.
 
-Last updated: 2026-02-25 20:17
+Last updated: 2026-02-26 12:57
 
 ---
 
@@ -51,24 +51,34 @@ Snaarp implements a draggable dashboard using @dnd-kit. The layout is responsive
 Recommended Node.js: v18 or newer
 
 ## Project Structure
-Root
-- README.md (this file)
-- client/
-  - package.json, Vite config, Tailwind config, etc.
-  - src/
-    - App.tsx (routing + Toaster provider)
-    - main.tsx (app entry)
-    - index.css (global styles)
+Full repository layout annotated with roles and key responsibilities.
+
+snarp/
+- README.md – Project documentation (you are here)
+- client/ – Vite + React frontend
+  - package.json – scripts and dependencies
+  - vite.config.ts – Vite config
+  - tsconfig.json / tsconfig.app.json – TypeScript configs
+  - public/ – static assets copied as-is to build
+  - src/ – application source code
+    - main.tsx – App entry; mounts React root
+    - App.tsx – Router + providers (e.g., Toaster)
+    - index.css – Global Tailwind styles
+    - assets/ – optional images/icons
     - layout/
-      - MainLayout.tsx (shell: header, content, footer)
+      - MainLayout.tsx – App shell (header with search + notifications, content outlet, footer). Wraps all pages.
     - components/
-      - Dashboard.tsx (draggable grid + Upload modal)
-      - SortableItem.tsx (sortable wrapper for widgets)
-      - WidgetCard.tsx (card UI for each widget)
-      - layout/Sidebar.tsx (left navigation; supports desktop/overlay variants)
-      - UploadDropzone.tsx (file picker/drag-drop + previews + simulated upload)
-    - data.ts (initial widgets + navigation items)
-    - types/widget.ts (shared types and props)
+      - Dashboard.tsx – Homepage containing:
+        - Draggable widgets grid (DnD via @dnd-kit)
+        - Uploads section with grid/table toggle, drag-sorting, preview modal
+        - Upload modal that renders UploadDropzone
+      - UploadDropzone.tsx – Drag-and-drop area and file picker inside the modal. Builds a client-side list of selected files, shows previews, and hands completed assets up to Dashboard.
+      - SortableItem.tsx – Sortable wrapper for grid items (uploads grid and widgets grid)
+      - SortableRow.tsx – Sortable wrapper for table rows (uploads table)
+      - WidgetCard.tsx – Presentation for each dashboard widget
+      - layout/Sidebar.tsx – Left navigation (desktop variant in this demo)
+    - data.ts – Initial widgets and any static content
+    - types/widget.ts – Shared TypeScript types for widgets and assets
 
 ## Getting Started
 1) Install dependencies
@@ -94,16 +104,17 @@ Root
 - Click and drag a widget card to reorder it; keyboard users can also re-order using the configured @dnd-kit keyboard sensor.
 - Changes persist automatically to localStorage under the key "dashboard-layout".
 
-### Upload Dropzone
-- Click the Upload button to open the modal.
-- Drag and drop files into the drop area or click to browse and select multiple files.
-- Image files get a live preview using URL.createObjectURL.
-- Remove individual items using the X button on each preview.
-- Click "Upload files" to simulate an upload (about 1.5s). When done:
-  - All generated object URLs are revoked to prevent memory leaks.
-  - The selection is cleared and a success toast is shown.
+### Uploads Section & Dropzone
+- Click the Upload button to open the modal with a drag-and-drop area (or Browse).
+- Select multiple files; images show previews. Remove individual selections before uploading.
+- Click "Upload files" to simulate an upload. When complete, the files appear in the Uploaded Files section on the dashboard.
+- Layout toggle: switch between Grid and Table for uploaded items. Your choice persists in localStorage.
+- Reorder uploads by dragging (grid: cards, table: rows). Order persists in localStorage.
+- Mobile actions: on small screens, each upload has a compact dropdown with View, Edit (rename), and Delete. On larger screens, these appear as inline buttons.
 
-Note: The demo does not persist uploaded file data to localStorage or a backend. It is purely a front-end simulation with previews and toasts.
+Notes
+- Uploaded items are stored in localStorage under "uploaded-assets" with basic metadata (name, type, size, data URL, createdAt).
+- This is a demo; there is no backend. Data stays in your browser and can be cleared via site data or code changes.
 
 ## Architecture & Decisions
 ### State Persistence
